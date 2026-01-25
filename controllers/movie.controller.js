@@ -53,7 +53,54 @@ const deleteMovie = async (req, res) => {
 
 
 
+const getMovie = async (req, res) => {
+  try {
+
+   
+    if (!mongoose.Types.ObjectId.isValid(req.params.movieId)) {
+      return res.status(400).json({
+        success: false,
+        error: {},
+        message: "Invalid movie ID",
+        data: {}
+      });
+    }
+
+    
+    const data = await Movie.findById(req.params.movieId);
+
+  
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        error: {},
+        message: "Movie not found",
+        data: {}
+      });
+    }
+
+ 
+    return res.status(200).json({
+      success: true,
+      error: {},
+      message: "Successfully fetched the movie",
+      data: data
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error,
+      message: "Something went wrong",
+      data: {}
+    });
+  }
+};
+
+
+
 module.exports = {
   createMovie,
-  deleteMovie
+  deleteMovie,
+  getMovie
 };
