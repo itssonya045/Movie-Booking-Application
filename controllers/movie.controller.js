@@ -1,106 +1,142 @@
+const mongoose = require("mongoose");
 const Movie = require("../models/movie.model");
+
 
 const createMovie = async (req, res) => {
   try {
     const movie = await Movie.create(req.body);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      data: movie,
-      message: "Movie created successfully...!"
+      message: "Movie created successfully",
+      data: movie
     });
 
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+      return res.status(500).json({ success: false, message : error.message})
+
   }
 };
-
-const deleteMovie = async (req, res) => {
-  try {
-    const response = await Movie.deleteOne({
-      _id: req.params.movieId
-    });
-
-    if (response.deletedCount === 0) {
-      return res.status(404).json({
-        success: false,
-        error: {},
-        message: "Movie not found",
-        data: {}
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      error: {},
-      message: "Successfully deleted the movie",
-      data: response
-    });
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      error: error,
-      message: "Something went wrong",
-      data: {}
-    });
-  }
-};
-
 
 
 const getMovie = async (req, res) => {
   try {
+    const { id } = req.params;
 
-   
-    if (!mongoose.Types.ObjectId.isValid(req.params.movieId)) {
-      return res.status(400).json({
-        success: false,
-        error: {},
-        message: "Invalid movie ID",
-        data: {}
-      });
-    }
+    const movie = await Movie.findById(id);
 
-    
-    const data = await Movie.findById(req.params.movieId);
-
-  
-    if (!data) {
+    if (!movie) {
       return res.status(404).json({
         success: false,
-        error: {},
-        message: "Movie not found",
-        data: {}
+        message: "Movie not found"
       });
     }
 
- 
     return res.status(200).json({
       success: true,
-      error: {},
-      message: "Successfully fetched the movie",
-      data: data
+      message: "Movie fetched successfully",
+      data: movie
     });
 
   } catch (error) {
     return res.status(500).json({
       success: false,
-      error: error,
       message: "Something went wrong",
-      data: {}
+      error: error.message
     });
   }
 };
 
 
+const deleteMovie = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedMovie = await Movie.findByIdAndDelete(id);
+
+    if (!deletedMovie) {
+      return res.status(404).json({
+        success: false,
+        message: "Movie not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Movie deleted successfully",
+      data: deletedMovie
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message
+    });
+  }
+};
+
+const updateMovie = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      id,
+      data,
+      {
+        new: true,          
+        runValidators: true 
+      }
+    );
+
+    if (!updatedMovie) {
+      return res.status(404).json({
+        success: false,
+        message: "Movie not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Movie updated successfully",
+      data: updatedMovie
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message
+    });
+  }
+}
+
+const getAllMovies = async (req, res) => {
+  try {
+    const movies = await Movie.find();
+
+    return res.status(200).json({
+      success: true,
+      message: "Movies fetched successfully",
+      count: movies.length,
+      data: movies
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message
+    });
+  }
+};
+
 
 module.exports = {
   createMovie,
+  getMovie,
   deleteMovie,
-  getMovie
-};
+  updateMovie,
+  getAllMovies
+};  
