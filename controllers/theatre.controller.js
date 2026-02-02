@@ -19,6 +19,64 @@ const create = async(req,res)=>{
     }
 }
 
+const getTheater = async (req, res) => {
+    try {
+        const response = await theatreService.getTheater(req.params.id);
+
+        if (response.err) {
+            errorResponseBody.err = response.err;
+            return res.status(response.code).json(errorResponseBody);
+        }
+
+        successResponseBody.data = response;
+        successResponseBody.message = "Successfully fetched theatre";
+        return res.status(200).json(successResponseBody);
+
+    } catch (error) {
+        errorResponseBody.err = "Internal server error";
+        return res.status(500).json(errorResponseBody);
+    }
+};
+
+
+const getAllTheater = async(req,res)=>{
+    try {
+        const response = await theatreService.getAllTheater()
+        successResponseBody.data = response
+        successResponseBody.message = "successfully fetched all the theater"
+        return  res.status(200).json(successResponseBody)
+        
+    } catch (error) {
+        errorResponseBody.err = error
+        return res.status(500).json(errorResponseBody)
+    }
+}
+
+const deleteTheater = async(req,res)=>{
+    try {
+        const response = await theatreService.deleteTheater(req.params.id)
+
+        
+        if (response.err) {
+            errorResponseBody.err = response.err;
+            return res.status(response.code).json(errorResponseBody);
+        }
+
+        successResponseBody.data = response;
+        successResponseBody.message = "Successfully delete theatre";
+        return res.status(200).json(successResponseBody);
+
+        
+    } catch (error) {
+
+         errorResponseBody.err = error
+        return res.status(500).json(errorResponseBody)
+        
+    }
+}
 module.exports = {
-    create
+    create,
+    getTheater,
+    getAllTheater,
+    deleteTheater
 }
