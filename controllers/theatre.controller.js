@@ -41,7 +41,7 @@ const getTheater = async (req, res) => {
 
 const getAllTheater = async(req,res)=>{
     try {
-        const response = await theatreService.getAllTheater()
+        const response = await theatreService.getAllTheater(req.query)
         successResponseBody.data = response
         successResponseBody.message = "successfully fetched all the theater"
         return  res.status(200).json(successResponseBody)
@@ -74,9 +74,46 @@ const deleteTheater = async(req,res)=>{
         
     }
 }
+
+const updateMovies = async (req, res) => {
+  try {
+    const { movieIds, insert } = req.body;
+    const theaterId = req.params.id;
+
+    const response = await theatreService.updateMovieInTheater(
+      theaterId,
+      movieIds,
+      insert
+    );
+
+    if (response.err) {
+      return res.status(response.code).json({
+        ...errorResponseBody,        
+        err: response.err,
+        message: "Failed to update movies in the theater"
+      });
+    }
+
+    return res.status(200).json({
+      ...successResponseBody,       
+      data: response,
+      message: "Successfully updated movies in the theater"
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      ...errorResponseBody,
+      err: error.message
+    });
+  }
+};
+
+
 module.exports = {
     create,
     getTheater,
     getAllTheater,
-    deleteTheater
+    deleteTheater,
+    updateMovies
 }

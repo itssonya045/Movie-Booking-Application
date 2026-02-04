@@ -21,9 +21,14 @@ const theatreSchema = new mongoose.Schema(
       trim: true
     },
 
-    address: {
+    city : {
       type: String,
-      trim: true
+      trim: true,
+      required : true
+    },
+    movies :{
+      type : [mongoose.Schema.Types.ObjectId],
+      ref : 'Movie'
     }
   },
   { timestamps: true }

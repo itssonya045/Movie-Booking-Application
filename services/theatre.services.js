@@ -46,18 +46,41 @@ const getTheater = async (id) => {
   }
 };
 
-const getAllTheater = async()=>{
+const  getAllTheater= async (data) => {
   try {
+    let query = {};
 
-    const response = await  Theatre.find({})
-    return response
     
+    if (data?.city) {
+      query.city = data.city.trim();
+    }
+
+  
+    if (data?.pincode) {
+      query.pincode = Number(data.pincode);
+    }
+
+    
+    if (data?.name) {
+      query.name = { $regex: data.name.trim(), $options: "i" };
+    }
+
+    const page = Number(data.page) || 1;   
+    const limit = Number(data.limit) || 2; 
+    const skip = (page - 1) * limit;
+
+    const response = await Theatre.find(query).skip(skip).limit(limit);
+    return response;
+
   } catch (error) {
-    console.log(error)
-    throw error
-    
+    console.log(error);
+    throw error;
   }
-}
+};
+
+
+
+
 
 const deleteTheater = async (id) => {
   const theatre = await Theatre.findByIdAndDelete(id);
@@ -72,10 +95,39 @@ const deleteTheater = async (id) => {
   return theatre;
 };
 
+const updateMovieInTheater = async (theaterId, movieIds, insert) => {
+  const theatre = await Theatre.findById(theaterId);
+  
+  if (!theatre) {
+    return {
+      err: "No such theater found for the movie id provided...!",
+      code: 404
+    };
+  }
+
+  if (insert) {
+    movieIds.forEach(movieId => {
+      if (!theatre.movies.includes(movieId)) {
+        theatre.movies.push(movieId);
+      }
+    });
+  } else {
+    theatre.movies = theatre.movies.filter(
+      movieId => !movieIds.includes(movieId.toString())
+    );
+  }
+  await theatre.save();
+  return theatre.populate("movies");
+};
+
+
+
+
 
 module.exports = {
   createTheatre,
   getTheater,
   getAllTheater,
-  deleteTheater
+  deleteTheater, 
+  updateMovieInTheater
 };
