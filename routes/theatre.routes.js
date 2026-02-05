@@ -10,6 +10,8 @@ const routes = (app)=>{
 
     app.patch("/mba/api/v1/theatre/:id/movies",validateUpdateMoviesRequest ,theatreController.updateMovies)
 
+    app.get("/mba/api/v1/theater/:id/movies",theatreController.getMovies)
+
 }
 
 module.exports =routes

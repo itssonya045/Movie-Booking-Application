@@ -1,4 +1,5 @@
 const Theatre = require("../models/theatre.movie");
+const Movie = require("../models/movie.model")
 
 const createTheatre = async (data) => {
   try {
@@ -65,6 +66,16 @@ const  getAllTheater= async (data) => {
       query.name = { $regex: data.name.trim(), $options: "i" };
     }
 
+    /*    if(data?.movieId){
+      let movie = await Movie.findById(data.movieId)
+      query.movies = {$all : movie}
+    }*/
+
+  if (data?.movieId) {
+  query.movies = data.movieId;  
+}
+
+
     const page = Number(data.page) || 1;   
     const limit = Number(data.limit) || 2; 
     const skip = (page - 1) * limit;
@@ -79,6 +90,27 @@ const  getAllTheater= async (data) => {
 };
 
 
+const getMoviesInTheater = async (id) => {
+  try {
+    const theater = await Theatre
+      .findById(id, { name: 1, movies: 1, city: 1 })
+      .populate("movies");
+
+    // if theater not found
+    if (!theater) {
+      return {
+        err: "No theater with the given id",
+        code: 404
+      };
+    }
+
+    return theater;
+
+  } catch (error) {
+    // system / mongoose error
+    throw error;
+  }
+};
 
 
 
@@ -129,5 +161,6 @@ module.exports = {
   getTheater,
   getAllTheater,
   deleteTheater, 
-  updateMovieInTheater
+  updateMovieInTheater,
+  getMoviesInTheater
 };
