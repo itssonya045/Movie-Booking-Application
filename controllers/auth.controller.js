@@ -2,16 +2,20 @@ const userService = require("../services/user.services")
 const {successResponseBody,errorResponseBody} =require("../utils/resposebody")
 
 
-const signIn = async(req,res)=>{
+const signUp = async(req,res)=>{
     try {
 
-         const response = await userService.createUser(req.body);
+    const response = await userService.createUser(req.body);
     successResponseBody.data = response
     successResponseBody.message = "Successfully registed User"
     return res.status(200).json(successResponseBody)
         
     } catch (error) {
+        if(error.err){
+            errorResponseBody.err = error
+            return res.status(error.code).json(errorResponseBody)
 
+        }
         errorResponseBody.err = error
         return res.status(500).json(errorResponseBody)
         
@@ -19,6 +23,51 @@ const signIn = async(req,res)=>{
    
 }
 
+
+
+
+const signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1️⃣ Get user by email (service call)
+    const user = await userService.getEmail(email);
+    console.log(user)
+    // 2️⃣ Validate password (model method)
+    const isValidPassword = await user.isValidPassword(password);
+
+    if (!isValidPassword) {
+      errorResponseBody.message = "Invalid password for given email";
+      errorResponseBody.err = { password: "Password is incorrect" };
+
+      return res.status(401).json(errorResponseBody);
+    }
+
+    // 3️⃣ Success response
+    successResponseBody.message = "Successfully logged in user";
+    successResponseBody.data = {
+      email: user.email,
+      role: user.userRole,
+      status: user.userStatus,
+      token: "" // JWT will be added later
+    };
+
+    return res.status(200).json(successResponseBody);
+
+  } catch (error) {
+    errorResponseBody.message = error.message;
+    errorResponseBody.err = error;
+
+    return res.status(error.statusCode || 500).json(errorResponseBody);
+  }
+};
+
+
+
+
+
+
 module.exports = {
+    signUp,
     signIn
 }

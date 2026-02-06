@@ -56,4 +56,19 @@ userSchema.pre("save", async function () {
 });
 
 
+userSchema.methods.isValidPassword = async function (plainPassword) {
+  
+  const user = this;
+  console.log(plainPassword,user.password)
+
+  // Compare entered password with stored hashed password
+  const isMatch = await bcrypt.compare(
+    plainPassword,   // password entered by user (normal text)
+    user.password    // hashed password stored in database
+  );
+
+  // Return true or false
+  return isMatch;
+};
+
 module.exports = mongoose.model("User", userSchema);
