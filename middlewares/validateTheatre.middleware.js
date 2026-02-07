@@ -1,5 +1,7 @@
 const errorResponseBody = require("../utils/resposebody")
 
+const Userserivces = require("../services/user.services")
+
 /**
  * Validate CREATE THEATRE request
  */
@@ -84,7 +86,15 @@ const validateUpdateMoviesRequest = (req, res, next) => {
   next();
 };
 
+
+
+
+
+
+
+
 module.exports = {
   validateTheatreCreateRequest,
-  validateUpdateMoviesRequest
+  validateUpdateMoviesRequest,
+  
 };

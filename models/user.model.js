@@ -59,7 +59,7 @@ userSchema.pre("save", async function () {
 userSchema.methods.isValidPassword = async function (plainPassword) {
   
   const user = this;
-  console.log(plainPassword,user.password)
+ 
 
   // Compare entered password with stored hashed password
   const isMatch = await bcrypt.compare(

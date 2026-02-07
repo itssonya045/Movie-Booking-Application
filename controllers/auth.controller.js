@@ -1,5 +1,6 @@
 const userService = require("../services/user.services")
 const {successResponseBody,errorResponseBody} =require("../utils/resposebody")
+var jwt = require('jsonwebtoken');
 
 
 const signUp = async(req,res)=>{
@@ -32,8 +33,6 @@ const signIn = async (req, res) => {
 
     // 1️⃣ Get user by email (service call)
     const user = await userService.getEmail(email);
-    console.log(user)
-    // 2️⃣ Validate password (model method)
     const isValidPassword = await user.isValidPassword(password);
 
     if (!isValidPassword) {
@@ -43,13 +42,16 @@ const signIn = async (req, res) => {
       return res.status(401).json(errorResponseBody);
     }
 
+    const token = jwt.sign({id : user.id , email : user.email}, "moviebooking" , { expiresIn: "1h" })
+    
+
     // 3️⃣ Success response
     successResponseBody.message = "Successfully logged in user";
     successResponseBody.data = {
       email: user.email,
       role: user.userRole,
       status: user.userStatus,
-      token: "" // JWT will be added later
+      token: token
     };
 
     return res.status(200).json(successResponseBody);
