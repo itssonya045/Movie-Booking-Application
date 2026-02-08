@@ -53,6 +53,7 @@ const getAllTheater = async(req,res)=>{
 }
 
 const deleteTheater = async(req,res)=>{
+ 
     try {
         const response = await theatreService.deleteTheater(req.params.id)
 

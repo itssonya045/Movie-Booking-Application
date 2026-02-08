@@ -42,6 +42,21 @@ const getUser = async (id) => {
   return user;
 };
 
+const getUserById = async (id)=>{
+  try {
+    
+    const respose = await User.findById(id)
+    if(!respose){
+      throw { err : "No user find this id" , code : 404}
+    }
+    return respose
+  } catch (error) {
+    console.log(error)
+    throw error
+    
+  }
+}
+
 
 
 
@@ -49,5 +64,6 @@ const getUser = async (id) => {
 module.exports ={
     createUser,
     getEmail,
-    getUser
+    getUser,
+    getUserById
 }

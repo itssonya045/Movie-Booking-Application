@@ -42,7 +42,7 @@ const signIn = async (req, res) => {
       return res.status(401).json(errorResponseBody);
     }
 
-    const token = jwt.sign({id : user.id , email : user.email}, "moviebooking" , { expiresIn: "1h" })
+    const token = jwt.sign({_id : user._id , email : user.email}, "moviebooking" , { expiresIn: "1h" })
     
 
     // 3️⃣ Success response
@@ -64,6 +64,39 @@ const signIn = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    // 1. Get logged-in user from DB using userId
+    const user = await userService.getUserById(req.user);
+
+    // 2. Check old password
+    const isOldPasswordCorrect = await user.isValidPassword(
+      req.body.oldPassword
+    );
+
+    if (!isOldPasswordCorrect) {
+      throw {
+        err: "Invalid password, please enter correct old password",
+        code: 403
+      };
+    }
+
+    // 3. Set new password (hashed in schema pre-save)
+    user.password = req.body.newPassword;
+
+    // 4. Save user
+    await user.save();
+
+    successResponseBody.data = user;
+    successResponseBody.message =
+      "Successfully updated the password for the logged-in user";
+
+    return res.status(200).json(successResponseBody);
+  } catch (error) {
+    errorResponseBody.err = error.err || "Internal Server Error";
+    return res.status(error.code || 500).json(errorResponseBody);
+  }
+};
 
 
 
@@ -71,5 +104,6 @@ const signIn = async (req, res) => {
 
 module.exports = {
     signUp,
-    signIn
+    signIn,
+    resetPassword
 }

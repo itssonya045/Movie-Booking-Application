@@ -49,41 +49,33 @@ const validateSignin  = (req,res,next)=>{
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    // 1️⃣ Get token from header
     const token = req.headers["x-access-token"];
-
-
     if (!token) {
-      errorResponseBody.err = "Token is not provided";
-      errorResponseBody.message = "Authentication failed";
-
-      return res.status(401).json(errorResponseBody);
+      return res.status(401).json({
+        success: false,
+        message: "Token not provided"
+      });
     }
 
-    // 2️⃣ Verify token
     const decoded = jwt.verify(token, "moviebooking");
-  
+    console.log("Decoded:", decoded);
 
-    // 3️⃣ Get user from DB
     const user = await Userserivces.getUser(decoded._id);
-
     if (!user) {
-      errorResponseBody.err = "User not found";
-      errorResponseBody.message = "Authentication failed";
-
-      return res.status(404).json(errorResponseBody);
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
 
-    // 4️⃣ Attach user info to request
-    req.user = user;
-
-    // 5️⃣ Move to next middleware/controller
+    req.user = user._id;
     next();
   } catch (error) {
-    errorResponseBody.err = error.message;
-    errorResponseBody.message = "Invalid or expired token";
-
-    return res.status(401).json(errorResponseBody);
+    console.log("AUTH ERROR 👉", error);
+    return res.status(401).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
