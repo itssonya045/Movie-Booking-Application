@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {BOOKING_STATUS } =require("../utils/constant")
 
 const bookingSchema = new mongoose.Schema({
   theaterId: {
@@ -31,10 +32,10 @@ const bookingSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: {
-      values: ["IN_PROGRESS", "SUCCESSFUL", "CANCEL"],
+      values: [BOOKING_STATUS.IN_PROGRESS, BOOKING_STATUS.SUCCESSFUL, BOOKING_STATUS.CANCEL],
       message: "{VALUE} is not supported"
     },
-    default: "IN_PROGRESS"
+    default:BOOKING_STATUS.IN_PROGRESS
   }
 }, { timestamps: true });
 
