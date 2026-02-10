@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const {successResponseBody , errorResponseBody} = require("../utils/resposebody")
-const createMovieService =require("../services/movie.services")
-const getMovieByIdService = require("../services/movie.services")
+const {createMovieService} =require("../services/movie.services")
+const {getMovieByIdService} = require("../services/movie.services")
 const {deleteMovieService ,updateMovieService,getAllMoviesService} = require('../services/movie.services');
 
 

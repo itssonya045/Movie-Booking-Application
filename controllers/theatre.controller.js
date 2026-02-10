@@ -139,6 +139,57 @@ const getMovies = async (req, res) => {
 };
 
 
+const updateTheatre = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    const theatre = await theatreService.updateTheatreService(id, data);
+
+    if (!theatre) {
+      return res.status(404).json({
+        ...errorResponseBody,
+        message: 'Theatre not found'
+      });
+    }
+
+    return res.status(200).json({
+      ...successResponseBody,
+      message: 'Theatre updated successfully',
+      data: theatre
+    });
+
+  } catch (error) {
+    console.log('Update theatre error:', error);
+
+    // Validation error
+    if (error.name === 'ValidationError') {
+      let err = {};
+      Object.keys(error.errors).forEach((key) => {
+        err[key] = error.errors[key].message;
+      });
+
+      return res.status(422).json({
+        ...errorResponseBody,
+        err,
+        message: 'Validation failed'
+      });
+    }
+
+    // Invalid MongoDB ID
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        ...errorResponseBody,
+        message: 'Invalid theatre id'
+      });
+    }
+
+    return res.status(500).json({
+      ...errorResponseBody
+    });
+  }
+};
+
 
 module.exports = {
     create,
@@ -146,5 +197,6 @@ module.exports = {
     getAllTheater,
     deleteTheater,
     updateMovies,
-    getMovies
+    getMovies,
+    updateTheatre
 }

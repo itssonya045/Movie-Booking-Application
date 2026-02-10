@@ -160,9 +160,16 @@ const updateMovieInTheater = async (theaterId, movieIds, insert) => {
   return theatre.populate("movies");
 };
 
-
-
-
+const updateTheatreService = async (theatreId, data) => {
+  return await Theatre.findByIdAndUpdate(
+    theatreId,
+    data,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+};
 
 module.exports = {
   createTheatre,
@@ -170,5 +177,7 @@ module.exports = {
   getAllTheater,
   deleteTheater, 
   updateMovieInTheater,
-  getMoviesInTheater
+  getMoviesInTheater,
+  updateTheatreService
+  
 };
