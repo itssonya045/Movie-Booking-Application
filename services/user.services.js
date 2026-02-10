@@ -58,6 +58,48 @@ const getUserById = async (id)=>{
 }
 
 
+const updateUserRoleorStatus = async (data, userId) => {
+  try {
+    let updateQuery = {};
+
+    if (data.userRole) {
+      updateQuery.userRole = data.userRole;
+    }
+
+    if (data.userStatus) {
+      updateQuery.userStatus = data.userStatus;
+    }
+
+    const response = await User.findByIdAndUpdate(
+      userId,
+      updateQuery,
+      { new: true, runValidators: true }
+    );
+
+    if (!response) {
+      throw { message: "No user found with this id", code: 404 };
+    }
+
+    return response;
+
+  } catch (error) {
+
+    // 🔹 Mongoose validation error
+    if (error.name === "ValidationError") {
+      let err = {};
+
+      Object.keys(error.errors).forEach((key) => {
+        err[key] = error.errors[key].message;
+      });
+
+      throw { message: err, code: 400 };
+    }
+
+    // 🔹 Other errors
+    throw error;
+  }
+};
+
 
 
 
@@ -65,5 +107,6 @@ module.exports ={
     createUser,
     getEmail,
     getUser,
-    getUserById
+    getUserById,
+    updateUserRoleorStatus
 }

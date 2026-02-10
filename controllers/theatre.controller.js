@@ -1,23 +1,28 @@
 const theatreService = require("../services/theatre.services")
 const {successResponseBody,errorResponseBody} = require("../utils/resposebody")
 
-const create = async(req,res)=>{
-    try {
-        const respose = await theatreService.createTheatre(req.body)
-        if(respose.err){
-            errorResponseBody.err = respose.err
-            errorResponseBody.message = "Validation failed on few parameters of the request body"
-            return res.status(respose.code).json(errorResponseBody)
-        }
-        successResponseBody.data = respose
-        successResponseBody.message = "Successfully created theatre"
-        res.status(201).json(successResponseBody)
-    } catch (error) {
-        errorResponseBody.err = error
-        res.status(500).json(errorResponseBody)
-        
-    }
-}
+const create = async (req, res) => {
+  try {
+    const response = await theatreService.createTheatre(req.body);
+
+    const successRes = {
+      ...successResponseBody,
+      data: response,
+      message: "Successfully created theatre"
+    };
+
+    return res.status(201).json(successRes);
+
+  } catch (error) {
+    const errorRes = {
+      ...errorResponseBody,
+      err: error
+    };
+
+    return res.status(500).json(errorRes);
+  }
+};
+
 
 const getTheater = async (req, res) => {
     try {

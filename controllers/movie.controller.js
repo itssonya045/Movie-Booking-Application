@@ -1,136 +1,188 @@
 const mongoose = require("mongoose");
-const Movie = require("../models/movie.model");
+const {successResponseBody , errorResponseBody} = require("../utils/resposebody")
+const createMovieService =require("../services/movie.services")
+const getMovieByIdService = require("../services/movie.services")
+const {deleteMovieService ,updateMovieService,getAllMoviesService} = require('../services/movie.services');
 
 
 const createMovie = async (req, res) => {
   try {
-    const movie = await Movie.create(req.body);
+    const movie = await createMovieService(req.body);
 
     return res.status(201).json({
-      success: true,
-      message: "Movie created successfully",
-      data: movie
+      ...successResponseBody,
+      data: movie,
+      message: 'Movie created successfully'
     });
 
   } catch (error) {
-      return res.status(500).json({ success: false, message : error.message})
+    console.log('Movie creation error:', error);
 
+    
+    if (error.name === 'ValidationError') {
+      let err = {};
+      Object.keys(error.errors).forEach((key) => {
+        err[key] = error.errors[key].message;
+      });
+
+      return res.status(422).json({
+        ...errorResponseBody,
+        err,
+        message: 'Validation failed'
+      });
+    }
+
+    // Internal server error
+    return res.status(500).json({
+      ...errorResponseBody,
+      message: error.message
+    });
   }
 };
-
 
 const getMovie = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const movie = await Movie.findById(id);
+    const movie = await getMovieByIdService(id);
 
     if (!movie) {
       return res.status(404).json({
-        success: false,
-        message: "Movie not found"
+        ...errorResponseBody,
+        message: 'Movie not found'
       });
     }
 
     return res.status(200).json({
-      success: true,
-      message: "Movie fetched successfully",
-      data: movie
+      ...successResponseBody,
+      data: movie,
+      message: 'Movie fetched successfully'
     });
 
   } catch (error) {
+    console.log('Get movie error:', error);
+
+    // Invalid MongoDB ObjectId
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        ...errorResponseBody,
+        message: 'Invalid movie id'
+      });
+    }
+
     return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error.message
+      ...errorResponseBody
     });
-  }
-};
+  }}
 
 
+/* DELETE movie */
 const deleteMovie = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedMovie = await Movie.findByIdAndDelete(id);
+    const movie = await deleteMovieService(id);
 
-    if (!deletedMovie) {
+    if (!movie) {
       return res.status(404).json({
-        success: false,
-        message: "Movie not found"
+        ...errorResponseBody,
+        message: 'Movie not found'
       });
     }
 
     return res.status(200).json({
-      success: true,
-      message: "Movie deleted successfully",
-      data: deletedMovie
+      ...successResponseBody,
+      message: 'Movie deleted successfully',
+      data: movie
     });
 
   } catch (error) {
+    console.log('Delete movie error:', error);
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        ...errorResponseBody,
+        message: 'Invalid movie id'
+      });
+    }
+
     return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error.message
+      ...errorResponseBody
     });
   }
 };
 
+/* UPDATE movie */
 const updateMovie = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = req.body;
 
-    const updatedMovie = await Movie.findByIdAndUpdate(
-      id,
-      data,
-      {
-        new: true,          
-        runValidators: true 
-      }
-    );
+    const movie = await updateMovieService(id, req.body);
 
-    if (!updatedMovie) {
+    if (!movie) {
       return res.status(404).json({
-        success: false,
-        message: "Movie not found"
+        ...errorResponseBody,
+        message: 'Movie not found'
       });
     }
 
     return res.status(200).json({
-      success: true,
-      message: "Movie updated successfully",
-      data: updatedMovie
+      ...successResponseBody,
+      message: 'Movie updated successfully',
+      data: movie
     });
 
   } catch (error) {
+    console.log('Update movie error:', error);
+
+    if (error.name === 'ValidationError') {
+      let err = {};
+      Object.keys(error.errors).forEach((key) => {
+        err[key] = error.errors[key].message;
+      });
+
+      return res.status(422).json({
+        ...errorResponseBody,
+        err,
+        message: 'Validation failed'
+      });
+    }
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        ...errorResponseBody,
+        message: 'Invalid movie id'
+      });
+    }
+
     return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error.message
-    });
-  }
-}
-
-const getAllMovies = async (req, res) => {
-  try {
-    const movies = await Movie.find();
-
-    return res.status(200).json({
-      success: true,
-      message: "Movies fetched successfully",
-      count: movies.length,
-      data: movies
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error.message
+      ...errorResponseBody
     });
   }
 };
+
+/* GET all movies */
+const getAllMovies = async (req, res) => {
+  try {
+    const movies = await getAllMoviesService();
+
+    return res.status(200).json({
+      ...successResponseBody,
+      message: 'Movies fetched successfully',
+      data: movies,
+      count: movies.length
+    });
+
+  } catch (error) {
+    console.log('Get all movies error:', error);
+
+    return res.status(500).json({
+      ...errorResponseBody
+    });
+  }
+};
+
+
 
 
 module.exports = {

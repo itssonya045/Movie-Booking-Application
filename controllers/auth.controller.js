@@ -33,7 +33,9 @@ const signIn = async (req, res) => {
 
     // 1️⃣ Get user by email (service call)
     const user = await userService.getEmail(email);
+    
     const isValidPassword = await user.isValidPassword(password);
+   
 
     if (!isValidPassword) {
       errorResponseBody.message = "Invalid password for given email";
@@ -66,6 +68,7 @@ const signIn = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
+    
     // 1. Get logged-in user from DB using userId
     const user = await userService.getUserById(req.user);
 

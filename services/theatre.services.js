@@ -7,21 +7,29 @@ const createTheatre = async (data) => {
     return response;
 
   } catch (error) {
-    console.log("Theatre creation error:", error);
+    console.error("Theatre creation error:", error);
 
     if (error.name === "ValidationError") {
-      let err = {};
-
+      const err = {};
       Object.keys(error.errors).forEach((key) => {
         err[key] = error.errors[key].message;
       });
-      return { err, code: 422 };
+
+      throw {
+        statusCode: 422,
+        message: "Validation failed",
+        err
+      };
     }
 
-    
-    return { err: "Something went wrong", code: 500 };
+    throw {
+      statusCode: 500,
+      message: "Something went wrong",
+      err: {}
+    };
   }
 };
+
 
 const getTheater = async (id) => {
   try {

@@ -1,6 +1,7 @@
 const { errorResponseBody } = require("../utils/resposebody")
 const jwt = require("jsonwebtoken")
 const Userserivces = require("../services/user.services")
+const {USER_ROLE , USER_STATUS} = require("../utils/constant")
 
 const validateSignup = (req, res, next) => {
   if (!req.body.name) {
@@ -58,7 +59,7 @@ const isAuthenticated = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, "moviebooking");
-    console.log("Decoded:", decoded);
+    
 
     const user = await Userserivces.getUser(decoded._id);
     if (!user) {
@@ -79,4 +80,46 @@ const isAuthenticated = async (req, res, next) => {
   }
 };
 
-module.exports ={ validateSignup , validateSignin , isAuthenticated}
+const validateRestPassword = async (req ,res , next) =>{
+
+  if(!req.body.oldPassword){
+    errorResponseBody.err = "Missing the old password in request"
+  }
+
+  if(!req.body.newPassword){
+    errorResponseBody.err = "Missing the new password in request"
+  }
+
+  next()
+}
+
+const isAdmin = async(req,res,next)=>{
+  const user = await Userserivces.getUser(req.user)
+  if(user.userRole != USER_ROLE.admin){
+    errorResponseBody.err = "User is not admin , cannot procced the request"
+    return res.status(402).json(errorResponseBody)
+  }
+  next()
+}
+
+const isClient = async(req,res,next)=>{
+  const user = await Userserivces.getUser(req.user)
+  if(user.userStatus != USER_STATUS.client){
+    errorResponseBody.err = "User is not client , cannot procced the request"
+    return res.status(402).json(errorResponseBody)
+  }
+  next()
+}
+
+const isAdminOrClient = async(req,res,next) =>{
+   const user = await Userserivces.getUser(req.user)
+   if(user.userRole != USER_ROLE.admin && user.userRole != USER_ROLE.client){
+    errorResponseBody.err = "User is not client or admin, cannot procced the request"
+    return res.status(402).json(errorResponseBody)
+
+   }
+
+   next()
+}
+
+module.exports ={ validateSignup , validateSignin , isAuthenticated , validateRestPassword , isAdmin , isClient , isAdminOrClient}
