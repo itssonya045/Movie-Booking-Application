@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
-const { errorResponseBody } = require("../utils/resposebody");
-const { getTheater } = require("../services/theatre.services");
+const { errorResponseBody , successResponseBody } = require("../utils/resposebody");
+const { getTheater } = require("../services/theatre.services")
+const {getUserById} = require("../services/user.services")
+const {BOOKING_STATUS ,USER_ROLE, USER_STATUS} = require("../utils/constant")
 
 const validateBookingCreateRequest = async (req, res, next) => {
   try {
@@ -59,4 +61,12 @@ const validateBookingCreateRequest = async (req, res, next) => {
   }
 };
 
-module.exports = { validateBookingCreateRequest };
+const changeStatus = async(req,res,next)=>{
+    const user = await getUserById(req.user)
+    if(user.userRole === USER_ROLE.customer && req.body.status && req.body.status !== BOOKING_STATUS.CANCEL){
+        errorResponseBody.err = "YOU are not allowed to the change the status"
+        return res.status(500).json(errorResponseBody)
+    }
+    next()
+}
+module.exports = { validateBookingCreateRequest , changeStatus };

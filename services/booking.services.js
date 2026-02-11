@@ -1,4 +1,5 @@
 const Booking = require("../models/booking.model")
+const { errorResponseBody } = require("../utils/resposebody")
 
 const createBooking = async(data)=>{
     try {
@@ -10,6 +11,23 @@ const createBooking = async(data)=>{
     }
 }
 
+const updateBooking = async (bookingId, data) => {
+  try {
+    const response = await Booking.findByIdAndUpdate(
+      bookingId,
+      data,
+      {
+        runValidators: true,
+        new: true
+      }
+    );
+
+    return response; // ✅ IMPORTANT
+  } catch (error) {
+    throw error; // ✅ Let controller handle it
+  }
+};
+
 module.exports = {
-    createBooking
+    createBooking, updateBooking
 }
