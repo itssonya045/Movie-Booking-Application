@@ -49,6 +49,8 @@ const validateSignin  = (req,res,next)=>{
 }
 
 const isAuthenticated = async (req, res, next) => {
+ 
+
   try {
     const token = req.headers["x-access-token"];
     if (!token) {
@@ -72,7 +74,7 @@ const isAuthenticated = async (req, res, next) => {
     req.user = user._id;
     next();
   } catch (error) {
-    console.log("AUTH ERROR 👉", error);
+  
     return res.status(401).json({
       success: false,
       message: error.message

@@ -51,7 +51,7 @@ const getUserById = async (id)=>{
     }
     return respose
   } catch (error) {
-    console.log(error)
+   
     throw error
     
   }

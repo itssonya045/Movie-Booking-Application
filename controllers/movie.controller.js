@@ -16,7 +16,7 @@ const createMovie = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Movie creation error:', error);
+   
 
     
     if (error.name === 'ValidationError') {
@@ -60,7 +60,7 @@ const getMovie = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Get movie error:', error);
+
 
     // Invalid MongoDB ObjectId
     if (error.name === 'CastError') {
@@ -97,7 +97,7 @@ const deleteMovie = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Delete movie error:', error);
+    
 
     if (error.name === 'CastError') {
       return res.status(400).json({
@@ -133,7 +133,7 @@ const updateMovie = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Update movie error:', error);
+  
 
     if (error.name === 'ValidationError') {
       let err = {};
@@ -174,7 +174,7 @@ const getAllMovies = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Get all movies error:', error);
+  
 
     return res.status(500).json({
       ...errorResponseBody

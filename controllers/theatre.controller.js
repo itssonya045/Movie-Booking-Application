@@ -160,7 +160,7 @@ const updateTheatre = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Update theatre error:', error);
+
 
     // Validation error
     if (error.name === 'ValidationError') {

@@ -1,3 +1,4 @@
+
 const bookingServices = require("../services/booking.services")
 const { successResponseBody, errorResponseBody } = require("../utils/resposebody")
 
@@ -40,7 +41,54 @@ const update = async (req, res) => {
   }
 };
 
+const getBookings = async (req, res) => {
+    
+
+  try {
+    const response = await bookingServices.getBooking({
+      userId: req.user // better practice
+    });
+
+    successResponseBody.data = response;
+    successResponseBody.message = "Successfully fetched all bookings";
+
+    return res.status(200).json(successResponseBody);
+
+  } catch (error) {
+    errorResponseBody.err = error.message || "Internal Server Error";
+    return res.status(500).json(errorResponseBody);
+  }
+};
+
+
+const getAllBookings = async (req, res) => {
+  try {
+    const response = await bookingServices.getAllBooking({}); // no filter
+
+    successResponseBody.data = response;
+    successResponseBody.message = "Successfully fetched all bookings";
+
+    return res.status(200).json(successResponseBody);
+
+  } catch (error) {
+    errorResponseBody.err = error.message || "Internal Server Error";
+    return res.status(500).json(errorResponseBody);
+  }
+};
+
+const allBookingById = async(req,res)=>{
+    try {
+        const respose = await bookingServices.getAllBookingById(req.params.id , req.user) 
+        successResponseBody.data = respose;
+        successResponseBody.message = "Successfully fetch the booking"
+        return res.status(200).json(successResponseBody)
+    } catch (error) {
+        errorResponseBody.err = error
+        return res.status(200).json(successResponseBody)
+    }
+}
+
 
 module.exports ={
-    create,update
+    create,update,getAllBookings,getBookings,allBookingById
 }

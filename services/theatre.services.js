@@ -46,7 +46,7 @@ const getTheater = async (id) => {
     return response;
 
   } catch (error) {
-    console.log("Error while fetching theatre:", error);
+    
 
     return {
       err: "Something went wrong",
@@ -92,7 +92,7 @@ const  getAllTheater= async (data) => {
     return response;
 
   } catch (error) {
-    console.log(error);
+  
     throw error;
   }
 };

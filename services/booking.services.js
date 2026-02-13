@@ -6,7 +6,7 @@ const createBooking = async(data)=>{
         const response = await Booking.create(data)
         return response
     } catch (error) {
-        console.log(error)
+     
         return error
     }
 }
@@ -24,10 +24,45 @@ const updateBooking = async (bookingId, data) => {
 
     return response; // ✅ IMPORTANT
   } catch (error) {
-    throw error; // ✅ Let controller handle it
+    throw error;
   }
 };
 
+const getBooking = async (data)=>{
+  
+
+    try {
+        const response = await Booking.find({
+            userId : data.userId
+        })
+        return response
+    } catch (error) {
+        throw error
+    }
+
+}
+
+
+const getAllBooking = async (data)=>{
+    try {
+        const response = await Booking.find({})
+        return response
+    } catch (error) {
+        throw error
+    }
+
+}
+
+const getAllBookingById = async(id)=>{
+    try {
+
+        const response = await Booking.findById(id)
+        return response
+        
+    } catch (error) {
+        throw error
+    }
+}
 module.exports = {
-    createBooking, updateBooking
+    createBooking, updateBooking , getBooking , getAllBooking , getAllBookingById
 }

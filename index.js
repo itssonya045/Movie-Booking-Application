@@ -5,6 +5,7 @@ const TheatreRoutes = require("./routes/theatre.routes")
 const authRoutes = require("./routes/auth.route");
 const userRouters = require("./routes/user.route")
 const bookingRoutes = require("./routes/booking.route")
+const ShowRoutes = require("./routes/show.route")
 const app = express();
 
 app.use(express.json());
@@ -16,6 +17,7 @@ TheatreRoutes(app)
 authRoutes(app)
 userRouters(app)
 bookingRoutes(app)
+ShowRoutes(app)
 
 
 app.get("/home", (req, res) => {
