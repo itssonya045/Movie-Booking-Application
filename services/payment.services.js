@@ -3,53 +3,66 @@ const { BOOKING_STATUS, PAYMENT_STATUS } = require("../utils/constant");
 const Payment = require("../models/payment.model")
 
 
+
 const createPayment = async (data) => {
+  try {
+    
+    const booking = await Booking.findById(data.bookingId);
 
-  const booking = await Booking.findById(data.bookingId);
-  if(booking.status === BOOKING_STATUS.SUCCESSFUL){
-    throw{
-        err : "Booking already done , cannot make the payment again",
-        code : 400
+    if (!booking) {
+      throw { err: "No booking found", code: 404 };
     }
-  }
 
-  if (!booking) {
-    throw { err: "No booking found", status: 404 };
-  }
+    if (booking.status === BOOKING_STATUS.SUCCESSFUL) {
+      throw {
+        err: "Booking already done, cannot make the payment again",
+        code: 400
+      };
+    }
 
-  const bookingTime = booking.createdAt.getTime();
-  const currentTime = Date.now();
-  const minutes = Math.floor((currentTime - bookingTime) / (1000 * 60));
+    
+    const bookingTime = booking.createdAt.getTime();
+    const currentTime = Date.now();
+    const minutes = Math.floor((currentTime - bookingTime) / (1000 * 60));
 
-  if (minutes > 5) {
-    booking.status = BOOKING_STATUS.EXPIRED;
-    await booking.save();
-    throw { err: "Booking expired", status: 400 };
-  }
+    if (minutes > 5) {
+      booking.status = BOOKING_STATUS.EXPIRED;
+      await booking.save();
 
-  const payment = await Payment.create({
-    bookingId: data.bookingId,
-    amount: data.amount
-  });
+      throw { err: "Booking expired", code: 400 };
+    }
 
-  if (payment.amount !== booking.totalCost) {
-    payment.status = PAYMENT_STATUS.FAILED;
+  
+    const payment = await Payment.create({
+      bookingId: data.bookingId,
+      amount: data.amount,
+      status: PAYMENT_STATUS.PENDING
+    });
+
+    if (payment.amount !== booking.totalCost) {
+      payment.status = PAYMENT_STATUS.FAILED;
+      await payment.save();
+
+      booking.status = BOOKING_STATUS.CANCELLED;
+      await booking.save();
+
+      throw { err: "Payment failed due to incorrect amount", code: 400 };
+    }
+
+    payment.status = PAYMENT_STATUS.SUCCESS;
     await payment.save();
 
-    booking.status = BOOKING_STATUS.CANCELLED;
+    booking.status = BOOKING_STATUS.SUCCESSFUL;
     await booking.save();
 
-    throw { err: "Payment failed", status: 400 };
+    return payment;
+
+  } catch (error) {
+    console.log("Payment creation error:", error);
+    throw error;
   }
-
-  payment.status = PAYMENT_STATUS.SUCCESS;
-  await payment.save();
-
-  booking.status = BOOKING_STATUS.SUCCESSFUL;
-  await booking.save();
-
-  return booking;
 };
+
 
 const getPaymentById = async (id)=>{
     try {
