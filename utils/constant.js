@@ -14,13 +14,14 @@ const USER_STATUS = {
 const BOOKING_STATUS = {
   IN_PROGRESS: "IN_PROGRESS",
   SUCCESSFUL: "SUCCESSFUL",
-  CANCEL: "CANCEL"
+  CANCEL: "CANCEL",
+   expired : "EXPIRED"
 }; 
 
 const PAYMENT_STATUS = {
   PENDING: "PENDING",
   SUCCESS: "SUCCESS",
-  FAILED: "FAILED",
+  FAILED: "FAILED"
 };
 
 module.exports = {

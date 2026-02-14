@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth.route");
 const userRouters = require("./routes/user.route")
 const bookingRoutes = require("./routes/booking.route")
 const ShowRoutes = require("./routes/show.route")
+const PaymentRoutes = require("./routes/payment.route")
 const app = express();
 
 app.use(express.json());
@@ -18,7 +19,7 @@ authRoutes(app)
 userRouters(app)
 bookingRoutes(app)
 ShowRoutes(app)
-
+PaymentRoutes(app)
 
 app.get("/home", (req, res) => {
   res.send("conected to database");
